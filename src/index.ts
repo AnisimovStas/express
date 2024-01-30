@@ -1,6 +1,8 @@
 import express from 'express'
+import * as dotenv from 'dotenv'
 const app = express()
-const port = 3000
+const port = process.env.port || 3000
+dotenv.config({path: '.env'})
 
 const jsonBodyMiddleware = express.json()
 app.use(jsonBodyMiddleware);
@@ -61,5 +63,5 @@ app.get('/stas', (req, res) => {
 
 
 app.listen(port, () => {
-    console.log(`Example app listening on port ${port}`)
+    console.log(`Example of ${process.env.STAS} app listening on port ${port}`)
 })
