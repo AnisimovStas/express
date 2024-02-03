@@ -1,6 +1,8 @@
 import {describe} from "node:test";
 import request from "supertest";
 import app from "../../src";
+import {CurrencyViewModel} from "../../src/models/CurrencyViewModel";
+import {ICurrencyCreateModel} from "../../src/models/CurrencyCreateModel";
 
 describe('/currencies', () => {
     beforeEach(async () => {
@@ -16,25 +18,27 @@ describe('/currencies', () => {
     })
 
     it('should create currency with correct input data', async () => {
+        const currencyDto: ICurrencyCreateModel = {name: 'chy', value: 100}
+
         const createResponse = await request(app)
             .post('/currencies')
-            .send({name: 'chy', value: 100})
+            .send(currencyDto)
             .expect(200);
 
         const createdCurrency = createResponse.body;
 
         expect(createdCurrency).toEqual({
             id: expect.any(Number),
-            name: 'chy',
-            value: 100,
+            name: currencyDto.name,
+            value: currencyDto.value,
         })
- 
+
         await request(app).get('/currencies').expect(200, [createdCurrency]);
     })
 
-    it('shouldnt create currency with incorrect input data', async () => {
+    it('should not create currency with incorrect input data', async () => {
 
-        const usdInArray = {
+        const usdInArray: CurrencyViewModel = {
             id: 1,
             name: 'usd',
             value: 100
@@ -48,7 +52,7 @@ describe('/currencies', () => {
         await request(app)
             .post('/currencies')
             .send({name: 'usd', value: 100})
-            .expect(401);
+            .expect(422);
 
         await request(app).get('/currencies').expect(200, [usdInArray]);
 
