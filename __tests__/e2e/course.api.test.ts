@@ -1,14 +1,14 @@
 import {describe} from "node:test";
 import request from "supertest";
-import app from "../../src";
 import {CurrencyViewModel} from "../../src/models/CurrencyViewModel";
 import {ICurrencyCreateModel} from "../../src/models/CurrencyCreateModel";
+import app from "../../src/app";
 
 describe('/currencies', () => {
     beforeEach(async () => {
         await request(app).delete('/currencies/drop');
     })
-
+ 
     it('should return 200 with empty array', async () => {
         await request(app).get('/currencies').expect(200, []);
     })
