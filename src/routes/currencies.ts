@@ -5,6 +5,11 @@ import {CurrencyViewModel} from "../models/CurrencyViewModel";
 import {ICurrencyCreateModel} from "../models/CurrencyCreateModel";
 import {getCurrencyViewModel} from "../db/db";
 import {currenciesRepository} from "../repositories/currencies-repository";
+import {body} from "express-validator";
+import {validationMiddleware} from "../middlewares/input-validation-middleware";
+
+const nameValidation = body('name').isString().isLength({min: 2, max: 4});
+const currencyValueValidation = body('value').isInt();
 
 
 export const getCurrenciesRoutes = () => {
@@ -35,22 +40,21 @@ export const getCurrenciesRoutes = () => {
         res.json(getCurrencyViewModel(currency));
     })
 
-    currenciesRouter.post('', (req: RequestWithBody<ICurrencyCreateModel>, res: Response<CurrencyViewModel>) => {
-        if (!req.body.name || !req.body.value) {
-            res.sendStatus(400);
-            return
-        }
+    currenciesRouter.post('',
+        nameValidation,
+        currencyValueValidation,
+        validationMiddleware,
+        (req: RequestWithBody<ICurrencyCreateModel>, res: Response<CurrencyViewModel>) => {
+            const newCurrency = currenciesRepository.addCurrency(req.body);
 
-        const newCurrency = currenciesRepository.addCurrency(req.body);
+            if (!newCurrency) {
+                res.sendStatus(422);
+                return
+            }
 
-        if (!newCurrency) {
-            res.sendStatus(422);
-            return
-        }
+            res.json(getCurrencyViewModel(newCurrency));
 
-        res.json(getCurrencyViewModel(newCurrency));
-
-    })
+        })
 
     return currenciesRouter
 

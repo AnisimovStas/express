@@ -1,6 +1,6 @@
 import express, {NextFunction, Request, Response} from "express";
 import {getCurrenciesRoutes} from "./routes/currencies";
-
+ 
 
 const app = express()
 
